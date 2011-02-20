@@ -101,6 +101,7 @@ public:
 	}
 
 	void KeyboardUp(unsigned char key){
+		B2_NOT_USED(key);
         printf("Arriba");
     }
 

@@ -166,6 +166,9 @@ void Keyboard(unsigned char key, int x, int y)
 }
 
 void KeyboardUp(unsigned char key, int x, int y){
+	B2_NOT_USED(x);
+	B2_NOT_USED(y);
+
     if(test)
     {
         test->KeyboardUp(key);
