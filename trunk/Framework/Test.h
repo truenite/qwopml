@@ -91,7 +91,7 @@ public:
 	Test* test;
 };
 
-class BoundaryListener : public b2BoundaryListener	
+class BoundaryListener : public b2BoundaryListener
 {
 public:
 	void Violation(b2Body* body);

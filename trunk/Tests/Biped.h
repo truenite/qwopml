@@ -20,11 +20,11 @@ public:
 	BipedDef def;
 
 	b2Body				*LFoot, *RFoot, *LCalf, *RCalf, *LThigh, *RThigh,
-						*Pelvis, *Stomach, *Chest, *Neck, *Head,
+						*Pelvis, *Chest, *Neck, *Head,
 						*LUpperArm, *RUpperArm, *LForearm, *RForearm, *LHand, *RHand;
 
-	b2RevoluteJoint		*LAnkle, *RAnkle, *LKnee, *RKnee, *LHip, *RHip, 
-						*LowerAbs, *UpperAbs, *LowerNeck, *UpperNeck,
+	b2RevoluteJoint		*LAnkle, *RAnkle, *LKnee, *RKnee, *LHip, *RHip,
+						*Abs, *LowerNeck, *UpperNeck,
 						*LShoulder, *RShoulder, *LElbow, *RElbow, *LWrist, *RWrist;
 };
 
