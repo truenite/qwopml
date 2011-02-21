@@ -95,22 +95,20 @@ void Timer(int)
 	glutTimerFunc(framePeriod, Timer, 0);
 }
 
-void MueveCamara(){
+void BipedLoop(){
 
 	if(test)
     {
-    viewCenter.x = test->posHead();
-	Resize(width, height);
+        float loop = test->loop();
+        viewCenter.x = loop;
+        Resize(width, height);
     }
-
-
-
 }
 
 void SimulationLoop()
 {
 
-	MueveCamara();
+	BipedLoop();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -121,11 +119,6 @@ void SimulationLoop()
 	test->Step(&settings);
 
 	DrawString(5, 15, entry->name);
-
-
-
-
-
 
 	glutSwapBuffers();
 
@@ -167,19 +160,11 @@ void Keyboard(unsigned char key, int x, int y)
 		Resize(width, height);
 		break;
 
-		// Press 'r' to reset.
-	case 'r':
+		// Press space to reset
+	case ' ':
 		delete test;
 		b2Assert(b2_byteCount == 0);
 		test = entry->createFcn();
-		break;
-
-		// Press space to launch a bomb.
-	case ' ':
-		if (test)
-		{
-			test->LaunchBomb();
-		}
 		break;
 
 	default:

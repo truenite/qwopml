@@ -122,7 +122,7 @@ public:
 
 		b2BodyDef circleBodyDef;
 		circleBodyDef.position.Set(5.0f, 2.0f);
-		
+
 		b2Body* body5 = m_world->CreateBody(&circleBodyDef);
 		body5->CreateShape(&circleShapeDef);
 		body5->SetMassFromShapes();

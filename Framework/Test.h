@@ -140,7 +140,7 @@ public:
 	virtual void Step(Settings* settings);
 	virtual void Keyboard(unsigned char key) { B2_NOT_USED(key); }
 	virtual void KeyboardUp(unsigned char key) { B2_NOT_USED(key); }
-	virtual float posHead(){}
+	virtual float loop(){}
 	void MouseDown(const b2Vec2& p);
 	void MouseUp();
 	void MouseMove(const b2Vec2& p);
@@ -148,7 +148,7 @@ public:
 
 	////pos cabeza
 
-	
+
 	//float posCabeza;
 
 	// Let derived tests know that a joint was destroyed.

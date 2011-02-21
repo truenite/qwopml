@@ -211,6 +211,34 @@ void Biped::SetMotorO(){
 	RKnee->SetMotorSpeed(2.5);
 	LElbow->SetMotorSpeed(2.5);
 }
+void Biped::UnSetMotorQW(){
+	LThigh->WakeUp();
+	RThigh->WakeUp();
+	Pelvis->WakeUp();
+	Chest->WakeUp();
+	RUpperArm->WakeUp();
+	LUpperArm->WakeUp();
+	LHip->SetMotorSpeed(0);
+	RShoulder->SetMotorSpeed(0);
+	RHip->SetMotorSpeed(0);
+	LShoulder->SetMotorSpeed(0);
+}
+
+
+void Biped::UnSetMotorOP(){
+	LCalf->WakeUp();
+	LThigh->WakeUp();
+	RCalf->WakeUp();
+	RThigh->WakeUp();
+	LForearm->WakeUp();
+	LUpperArm->WakeUp();
+	RForearm->WakeUp();
+	RUpperArm->WakeUp();
+	LKnee->SetMotorSpeed(0);
+	RElbow->SetMotorSpeed(0);
+	RKnee->SetMotorSpeed(0);
+	LElbow->SetMotorSpeed(0);
+}
 
 
 
