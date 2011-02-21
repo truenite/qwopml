@@ -163,10 +163,10 @@ void Biped::SetMotorQ(){
 	Chest->WakeUp();
 	RUpperArm->WakeUp();
 	LUpperArm->WakeUp();
-	LHip->SetMotorSpeed(2.5);
-	RShoulder->SetMotorSpeed(2.5);
-	RHip->SetMotorSpeed(-2.5);
-	LShoulder->SetMotorSpeed(-2.5);
+	LHip->SetMotorSpeed(-2.5);
+	RShoulder->SetMotorSpeed(-2.5);
+	RHip->SetMotorSpeed(2.5);
+	LShoulder->SetMotorSpeed(2.5);
 }
 
 void Biped::SetMotorW(){
@@ -176,10 +176,10 @@ void Biped::SetMotorW(){
 	Chest->WakeUp();
 	RUpperArm->WakeUp();
 	LUpperArm->WakeUp();
-	LHip->SetMotorSpeed(-2.5);
-	RShoulder->SetMotorSpeed(-2.5);
-	RHip->SetMotorSpeed(2.5);
-	LShoulder->SetMotorSpeed(2.5);
+	LHip->SetMotorSpeed(2.5);
+	RShoulder->SetMotorSpeed(2.5);
+	RHip->SetMotorSpeed(-2.5);
+	LShoulder->SetMotorSpeed(-2.5);
 }
 
 void Biped::SetMotorO(){
@@ -192,9 +192,9 @@ void Biped::SetMotorO(){
 	RForearm->WakeUp();
 	RUpperArm->WakeUp();
 	LKnee->SetMotorSpeed(2.5);
-	LElbow->SetMotorSpeed(2.5);
+	RElbow->SetMotorSpeed(2.5);
 	RKnee->SetMotorSpeed(-2.5);
-	RElbow->SetMotorSpeed(-2.5);
+	LElbow->SetMotorSpeed(-2.5);
 }
 
 void Biped::SetMotorP(){
@@ -207,9 +207,9 @@ void Biped::SetMotorP(){
 	RForearm->WakeUp();
 	RUpperArm->WakeUp();
 	LKnee->SetMotorSpeed(-2.5);
-	LElbow->SetMotorSpeed(-2.5);
+	RElbow->SetMotorSpeed(-2.5);
 	RKnee->SetMotorSpeed(2.5);
-	RElbow->SetMotorSpeed(2.5);
+	LElbow->SetMotorSpeed(2.5);
 }
 
 

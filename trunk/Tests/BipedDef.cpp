@@ -6,7 +6,7 @@ const float32 k_scale = 10.0f;
 
 BipedDef::BipedDef()
 {
-	SetMotorTorque(0.90f);
+	SetMotorTorque(3.0f);
 	SetMotorSpeed(0.0f);
 	SetDensity(0.005f);
 	SetRestitution(0.0f);
@@ -346,7 +346,7 @@ void BipedDef::DefaultJoints()
 		LKneeDef.localAnchor1	= RKneeDef.localAnchor1		= anchor - LCalfDef.position;
 		LKneeDef.localAnchor2	= RKneeDef.localAnchor2		= anchor - LThighDef.position;
 		LKneeDef.referenceAngle	= RKneeDef.referenceAngle	= 0.0f;
-		LKneeDef.lowerAngle		= RKneeDef.lowerAngle		= 0.0f;
+		LKneeDef.lowerAngle		= RKneeDef.lowerAngle		= 0.61799388f;
 		LKneeDef.upperAngle		= RKneeDef.upperAngle		= 2.61799388f;
 	}
 
@@ -419,7 +419,7 @@ void BipedDef::DefaultJoints()
 		LElbowDef.localAnchor2		= RElbowDef.localAnchor2	= anchor - LUpperArmDef.position;
 		LElbowDef.referenceAngle	= RElbowDef.referenceAngle	= 0.0f;
 		LElbowDef.lowerAngle		= RElbowDef.lowerAngle		= -2.2f;
-		LElbowDef.upperAngle		= RElbowDef.upperAngle		= -2.1;
+		LElbowDef.upperAngle		= RElbowDef.upperAngle		= -1.5;
 	}
 
 	//b.LWristDef.body1		= LHand;
@@ -437,7 +437,7 @@ void BipedDef::DefaultJoints()
 }
 
 //Separacion de izq y derecha Tate
-/*void BipedDef::DefaultPositions()
+void BipedDef::DefaultPositions()
 {
         LFootDef.position                                                                       = k_scale * b2Vec2(-.147f,-.901f);
         RFootDef.position                                                                       = k_scale * b2Vec2(.122f,-.901f);
@@ -453,23 +453,23 @@ void BipedDef::DefaultJoints()
         RHandDef.position                                                                       = k_scale * b2Vec2(.172f,-.136f);
         PelvisDef.position                                                                      = k_scale * b2Vec2(-.150f,-0.101f);
         ChestDef.position                                                                       = k_scale * b2Vec2(-.142f,.088f);//= k_scale * b2Vec2(-.017f,.252f);
-        NeckDef.position                                                                        = k_scale * b2Vec2(-.017f,.488f);
+        NeckDef.position                                                                        = k_scale * b2Vec2(-.067f,.488f);
         HeadDef.position                                                                        = k_scale * b2Vec2(.110f,.708f);
-}*/
-void BipedDef::DefaultPositions()
-{
-	LFootDef.position		= k_scale * b2Vec2(-.122f,-.901f);
-	RFootDef.position		= k_scale * b2Vec2(.222f,-.901f);
-	LCalfDef.position		= k_scale * b2Vec2(-.177f,-.771f);
-	RCalfDef.position		= k_scale * b2Vec2(.277f,-.771f);
-	LThighDef.position		= k_scale * b2Vec2(-.217f,-.391f);
-	RThighDef.position		= k_scale * b2Vec2(.317f,-.391f);
-	LUpperArmDef.position	= RUpperArmDef.position		= k_scale * b2Vec2(-.127f,.228f);
-	LForearmDef.position	= RForearmDef.position		= k_scale * b2Vec2(-.117f,-.011f);
-	LHandDef.position		= RHandDef.position			= k_scale * b2Vec2(-.112f,-.136f);
-	PelvisDef.position									= k_scale * b2Vec2(-.177f,-.101f);
-	ChestDef.position									= k_scale * b2Vec2(-.142f,.088f);
-	NeckDef.position									= k_scale * b2Vec2(-.102f,.518f);
-	HeadDef.position									= k_scale * b2Vec2(.022f,.738f);
 }
+//void BipedDef::DefaultPositions()
+//{
+//	LFootDef.position		= k_scale * b2Vec2(-.122f,-.901f);
+//	RFootDef.position		= k_scale * b2Vec2(.222f,-.901f);
+//	LCalfDef.position		= k_scale * b2Vec2(-.177f,-.771f);
+//	RCalfDef.position		= k_scale * b2Vec2(.277f,-.771f);
+//	LThighDef.position		= k_scale * b2Vec2(-.217f,-.391f);
+//	RThighDef.position		= k_scale * b2Vec2(.317f,-.391f);
+//	LUpperArmDef.position	= RUpperArmDef.position		= k_scale * b2Vec2(-.127f,.228f);
+//	LForearmDef.position	= RForearmDef.position		= k_scale * b2Vec2(-.117f,-.011f);
+//	LHandDef.position		= RHandDef.position			= k_scale * b2Vec2(-.112f,-.136f);
+//	PelvisDef.position									= k_scale * b2Vec2(-.177f,-.101f);
+//	ChestDef.position									= k_scale * b2Vec2(-.142f,.088f);
+//	NeckDef.position									= k_scale * b2Vec2(-.102f,.518f);
+//	HeadDef.position									= k_scale * b2Vec2(.022f,.738f);
+//}
 

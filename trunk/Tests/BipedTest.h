@@ -44,8 +44,8 @@ public:
 //			sd.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
 //			body->CreateShape(&sd);
 
-			sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
-			body->CreateShape(&sd);
+//			sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
+//			body->CreateShape(&sd);
 
 			sd.SetAsBox(0.5f, 100.0f, b2Vec2(0.0f, -10.0f), 0.5f * b2_pi);
 			body->CreateShape(&sd);
