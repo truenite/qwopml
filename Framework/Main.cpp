@@ -22,6 +22,9 @@
 
 #include "Render.h"
 #include "Test.h"
+#include <iostream>
+
+using namespace std;
 
 namespace
 {
@@ -92,8 +95,22 @@ void Timer(int)
 	glutTimerFunc(framePeriod, Timer, 0);
 }
 
+void MueveCamara(){
+
+	if(test)
+    {
+    viewCenter.x = test->posHead();
+	Resize(width, height);
+    }
+
+
+
+}
+
 void SimulationLoop()
 {
+
+	MueveCamara();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -105,7 +122,13 @@ void SimulationLoop()
 
 	DrawString(5, 15, entry->name);
 
+
+
+
+
+
 	glutSwapBuffers();
+
 
 	if (testSelection != testIndex)
 	{
@@ -118,6 +141,8 @@ void SimulationLoop()
 		Resize(width, height);
 	}
 }
+
+
 
 void Keyboard(unsigned char key, int x, int y)
 {
@@ -225,7 +250,7 @@ void Mouse(int32 button, int32 state, int32 x, int32 y)
 			b2Vec2 p = ConvertScreenToWorld(x, y);
 			test->MouseDown(p);
 		}
-		
+
 		if (state == GLUT_UP)
 		{
 			test->MouseUp();
@@ -233,7 +258,7 @@ void Mouse(int32 button, int32 state, int32 x, int32 y)
 	} else if (button == GLUT_RIGHT_BUTTON)
 	{
 		if (state == GLUT_DOWN)
-		{	
+		{
 			lastp = ConvertScreenToWorld(x, y);
 			rMouseDown = true;
 		}
@@ -249,7 +274,7 @@ void MouseMotion(int32 x, int32 y)
 {
 	b2Vec2 p = ConvertScreenToWorld(x, y);
 	test->MouseMove(p);
-	
+
 	if (rMouseDown){
 		b2Vec2 diff = p - lastp;
 		viewCenter.x -= diff.x;
@@ -296,7 +321,7 @@ int main(int argc, char** argv)
 	//glutSetOption (GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
 	glutDisplayFunc(SimulationLoop);
-	GLUI_Master.set_glutReshapeFunc(Resize);  
+	GLUI_Master.set_glutReshapeFunc(Resize);
 	GLUI_Master.set_glutKeyboardFunc(Keyboard);
 	glutKeyboardUpFunc(KeyboardUp);
 	GLUI_Master.set_glutSpecialFunc(KeyboardSpecial);
@@ -306,7 +331,7 @@ int main(int argc, char** argv)
 #endif
 	glutMotionFunc(MouseMotion);
 
-	glui = GLUI_Master.create_glui_subwindow( mainWindow, 
+	glui = GLUI_Master.create_glui_subwindow( mainWindow,
 		GLUI_SUBWINDOW_RIGHT );
 
 	glui->add_statictext("Tests");

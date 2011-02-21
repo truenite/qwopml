@@ -41,11 +41,11 @@ public:
 			sd.density = 0.0f;
 			sd.restitution = k_restitution;
 
-			/*sd.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
-			body->CreateShape(&sd);
+//			sd.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
+//			body->CreateShape(&sd);
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
-			body->CreateShape(&sd);*/
+			body->CreateShape(&sd);
 
 			sd.SetAsBox(0.5f, 100.0f, b2Vec2(0.0f, -10.0f), 0.5f * b2_pi);
 			body->CreateShape(&sd);
@@ -56,25 +56,6 @@ public:
 
 		m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
 
-
-
-
-		/*for (int32 i = 0; i < 8; ++i)
-		{
-			b2BodyDef bd;
-			bd.position.Set(5.0f, 20.0f + i);
-			bd.isBullet = true;
-			b2Body* body = m_world->CreateBody(&bd);
-			body->SetLinearVelocity(b2Vec2(0.0f, -100.0f));
-			body->SetAngularVelocity(b2Random(-50.0f, 50.0f));
-
-			b2CircleDef sd;
-			sd.radius = 0.25f;
-			sd.density = 15.0f;
-			sd.restitution = k_restitution;
-			body->CreateShape(&sd);
-			body->SetMassFromShapes();
-		}*/
 	}
 
 	~BipedTest()
@@ -105,6 +86,16 @@ public:
         printf("Arriba");
     }
 
+	void Step(Settings* settings)
+	{
+		Test::Step(settings);
+		DrawString(5, m_textLine, "Press 1-5 to drop stuff");
+		m_textLine += 15;
+	}
+
+	float posHead(){
+		return m_biped->Head->GetPosition().x;
+	}
 
 	static Test* Create()
 	{
