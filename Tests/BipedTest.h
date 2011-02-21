@@ -28,6 +28,7 @@ class BipedTest : public Test
 {
 public:
 
+    int distancia;
     BipedTest()
 	{
 
@@ -56,6 +57,7 @@ public:
 		}
 
 		m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
+		distancia = m_biped->Head->GetPosition().x;
 		InitQtable();
 		intToBinary(10);
 		printf("\n");
@@ -73,7 +75,7 @@ public:
 
 		switch(key){
 			case 'q':
-                action[0] = 1;
+                    action[0] = 1;
 				cout << "Q" << endl;
 				break;
 			case 'w':
@@ -88,6 +90,8 @@ public:
                 action[3 ] = 1;
 				cout << "P" << endl;
 				break;
+            case 'j': m_biped->~Biped();
+                        m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
 		}
 	}
 
@@ -116,7 +120,8 @@ public:
 	void Step(Settings* settings)
 	{
 		Test::Step(settings);
-		//DrawString(5, m_textLine, "Press 1-5 to drop stuff");
+		distancia = m_biped->Head->GetPosition().x;
+		DrawString(5, m_textLine, "distancia = %d", (int)distancia);
 		m_textLine += 15;
 	}
 
