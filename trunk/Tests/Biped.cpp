@@ -182,7 +182,7 @@ void Biped::SetMotorW(){
 	LShoulder->SetMotorSpeed(-2.5);
 }
 
-void Biped::SetMotorO(){
+void Biped::SetMotorP(){
 	LCalf->WakeUp();
 	LThigh->WakeUp();
 	RCalf->WakeUp();
@@ -197,7 +197,7 @@ void Biped::SetMotorO(){
 	LElbow->SetMotorSpeed(-2.5);
 }
 
-void Biped::SetMotorP(){
+void Biped::SetMotorO(){
 	LCalf->WakeUp();
 	LThigh->WakeUp();
 	RCalf->WakeUp();

@@ -8,7 +8,7 @@ BipedDef::BipedDef()
 {
 	SetMotorTorque(3.0f);
 	SetMotorSpeed(0.0f);
-	SetDensity(0.005f);
+	SetDensity(0.0015f);
 	SetRestitution(0.0f);
 	SetLinearDamping(0.0f);
 	SetAngularDamping(0.0f);
