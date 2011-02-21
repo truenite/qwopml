@@ -134,8 +134,8 @@ void BipedDef::SetMotorTorque(float f)
 	RAnkleDef.maxMotorTorque		= f;
 	LKneeDef.maxMotorTorque		= f;
 	RKneeDef.maxMotorTorque		= f;
-	LHipDef.maxMotorTorque			= f;
-	RHipDef.maxMotorTorque			= f;
+	LHipDef.maxMotorTorque			= 4.0;
+	RHipDef.maxMotorTorque			= 4.0;
 	AbsDef.maxMotorTorque		= f;
 	LowerNeckDef.maxMotorTorque	= f;
 	UpperNeckDef.maxMotorTorque	= f;
