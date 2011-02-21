@@ -14,6 +14,8 @@ public:
 	void SetMotorW();
 	void SetMotorO();
 	void SetMotorP();
+	void UnSetMotorQW();
+	void UnSetMotorOP();
 
 public:
 	b2World* m_world;

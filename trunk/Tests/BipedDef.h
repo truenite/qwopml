@@ -10,6 +10,7 @@ public:
 	~BipedDef(void);
 
 	void EnableMotor();
+	void SetUserData();
 	void SetMotorTorque(float);
 	void SetMotorSpeed(float);
 	void SetDensity(float);

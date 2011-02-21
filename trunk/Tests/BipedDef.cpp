@@ -13,6 +13,7 @@ BipedDef::BipedDef()
 	SetLinearDamping(0.0f);
 	SetAngularDamping(0.0f);
 	SetGroupIndex(--count);
+	SetUserData();
 	EnableMotor();
 	EnableLimit();
 
@@ -45,6 +46,26 @@ void BipedDef::IsFast(bool b)
 	LHandDef.isFast			= b;
 	RHandDef.isFast			= b;
 	*/
+}
+
+void BipedDef::SetUserData()
+{
+	LFootDef.userData		    = (void*)1;
+	RFootDef.userData		    = (void*)2;
+	LCalfDef.userData		    = (void*)3;
+	RCalfDef.userData		    = (void*)4;
+	LThighDef.userData  	    = (void*)5;
+	RThighDef.userData		    = (void*)6;
+	PelvisDef.userData		    = (void*)7;
+	ChestDef.userData		    = (void*)8;
+	NeckDef.userData		    = (void*)9;
+	HeadDef.userData		    = (void*)10;
+	LUpperArmDef.userData	    = (void*)11;
+	RUpperArmDef.userData	    = (void*)12;
+	LForearmDef.userData	    = (void*)13;
+	RForearmDef.userData        = (void*)14;
+	LHandDef.userData   	    = (void*)15;
+	RHandDef.userData		    = (void*)16;
 }
 
 void BipedDef::SetGroupIndex(int16 i)
@@ -89,7 +110,7 @@ void BipedDef::SetLinearDamping(float f)
 
 void BipedDef::SetAngularDamping(float f)
 {
-	LFootDef.angularDamping		= f;
+    LFootDef.angularDamping		= f;
 	RFootDef.angularDamping		= f;
 	LCalfDef.angularDamping		= f;
 	RCalfDef.angularDamping		= f;
