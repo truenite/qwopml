@@ -1,7 +1,7 @@
 #include "Biped.h"
 #include "BipedDef.h"
 
-Biped::Biped(b2World* w, const b2Vec2& position)				
+Biped::Biped(b2World* w, const b2Vec2& position)
 {
 	m_world = w;
 
@@ -50,12 +50,6 @@ Biped::Biped(b2World* w, const b2Vec2& position)
 	Pelvis = w->CreateBody(&bd);
 	Pelvis->CreateShape(&def.PelvisPoly);
 	Pelvis->SetMassFromShapes();
-
-	bd = def.PelvisDef;
-	bd.position += position;
-	Stomach = w->CreateBody(&bd);
-	Stomach->CreateShape(&def.StomachPoly);
-	Stomach->SetMassFromShapes();
 
 	bd = def.ChestDef;
 	bd.position += position;
@@ -110,7 +104,7 @@ Biped::Biped(b2World* w, const b2Vec2& position)
 	RHand = w->CreateBody(&bd);
 	RHand->CreateShape(&def.RHandPoly);
 	RHand->SetMassFromShapes();
-	
+
 	// link body parts
 	def.LAnkleDef.body1		= LFoot;
 	def.LAnkleDef.body2		= LCalf;
@@ -124,10 +118,8 @@ Biped::Biped(b2World* w, const b2Vec2& position)
 	def.LHipDef.body2		= Pelvis;
 	def.RHipDef.body1		= RThigh;
 	def.RHipDef.body2		= Pelvis;
-	def.LowerAbsDef.body1	= Pelvis;
-	def.LowerAbsDef.body2	= Stomach;
-	def.UpperAbsDef.body1	= Stomach;
-	def.UpperAbsDef.body2	= Chest;
+	def.AbsDef.body1	    = Pelvis;
+	def.AbsDef.body2	    = Chest;
 	def.LowerNeckDef.body1	= Chest;
 	def.LowerNeckDef.body2	= Neck;
 	def.UpperNeckDef.body1	= Chest;
@@ -144,7 +136,7 @@ Biped::Biped(b2World* w, const b2Vec2& position)
 	def.LWristDef.body2		= LForearm;
 	def.RWristDef.body1		= RHand;
 	def.RWristDef.body2		= RForearm;
-	
+
 	// create joints
 	LAnkle		= (b2RevoluteJoint*)w->CreateJoint(&def.LAnkleDef);
 	RAnkle		= (b2RevoluteJoint*)w->CreateJoint(&def.RAnkleDef);
@@ -152,8 +144,7 @@ Biped::Biped(b2World* w, const b2Vec2& position)
 	RKnee		= (b2RevoluteJoint*)w->CreateJoint(&def.RKneeDef);
 	LHip		= (b2RevoluteJoint*)w->CreateJoint(&def.LHipDef);
 	RHip		= (b2RevoluteJoint*)w->CreateJoint(&def.RHipDef);
-	LowerAbs	= (b2RevoluteJoint*)w->CreateJoint(&def.LowerAbsDef);
-	UpperAbs	= (b2RevoluteJoint*)w->CreateJoint(&def.UpperAbsDef);
+	Abs     	= (b2RevoluteJoint*)w->CreateJoint(&def.AbsDef);
 	LowerNeck	= (b2RevoluteJoint*)w->CreateJoint(&def.LowerNeckDef);
 	UpperNeck	= (b2RevoluteJoint*)w->CreateJoint(&def.UpperNeckDef);
 	LShoulder	= (b2RevoluteJoint*)w->CreateJoint(&def.LShoulderDef);
@@ -232,7 +223,6 @@ Biped::~Biped(void)
 	m_world->DestroyBody(LThigh);
 	m_world->DestroyBody(RThigh);
 	m_world->DestroyBody(Pelvis);
-	m_world->DestroyBody(Stomach);
 	m_world->DestroyBody(Chest);
 	m_world->DestroyBody(Neck);
 	m_world->DestroyBody(Head);

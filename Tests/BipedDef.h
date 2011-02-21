@@ -8,7 +8,7 @@ class BipedDef
 public:
 	BipedDef();
 	~BipedDef(void);
-	
+
 	void EnableMotor();
 	void SetMotorTorque(float);
 	void SetMotorSpeed(float);
@@ -29,18 +29,18 @@ public:
 
 	static int16 count;
 
-	b2BodyDef			LFootDef, RFootDef, LCalfDef, RCalfDef, LThighDef, RThighDef, 
-						PelvisDef, StomachDef, ChestDef, NeckDef, HeadDef, 
+	b2BodyDef			LFootDef, RFootDef, LCalfDef, RCalfDef, LThighDef, RThighDef,
+						PelvisDef, ChestDef, NeckDef, HeadDef,
 						LUpperArmDef, RUpperArmDef, LForearmDef, RForearmDef, LHandDef, RHandDef;
-	
+
 	b2PolygonDef		LFootPoly, RFootPoly, LCalfPoly, RCalfPoly, LThighPoly, RThighPoly,
-						PelvisPoly, StomachPoly, ChestPoly, NeckPoly,
+						PelvisPoly, ChestPoly, NeckPoly,
 						LUpperArmPoly, RUpperArmPoly, LForearmPoly, RForearmPoly, LHandPoly, RHandPoly;
-	
+
 	b2CircleDef			HeadCirc;
-	
-	b2RevoluteJointDef	LAnkleDef, RAnkleDef, LKneeDef, RKneeDef, LHipDef, RHipDef, 
-						LowerAbsDef, UpperAbsDef, LowerNeckDef, UpperNeckDef,
+
+	b2RevoluteJointDef	LAnkleDef, RAnkleDef, LKneeDef, RKneeDef, LHipDef, RHipDef,
+						AbsDef, LowerNeckDef, UpperNeckDef,
 						LShoulderDef, RShoulderDef, LElbowDef, RElbowDef, LWristDef, RWristDef;
 
 	void DefaultVertices();

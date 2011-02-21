@@ -1,7 +1,4 @@
 #include "BipedDef.h"
-#include <iostream>
-
-using namespace std;
 
 int16 BipedDef::count = 0;
 
@@ -9,24 +6,22 @@ const float32 k_scale = 10.0f;
 
 BipedDef::BipedDef()
 {
-	
-	EnableMotor();
-	SetMotorTorque(3.0f);
+	SetMotorTorque(0.90f);
 	SetMotorSpeed(0.0f);
 	SetDensity(0.005f);
 	SetRestitution(0.0f);
 	SetLinearDamping(0.0f);
 	SetAngularDamping(0.0f);
 	SetGroupIndex(--count);
-	EnableLimit();	
+	EnableMotor();
+	EnableLimit();
+
 	DefaultVertices();
 	DefaultPositions();
 	DefaultJoints();
 
 	LFootPoly.friction = RFootPoly.friction = 0.85f;
 }
-
-
 
 void BipedDef::IsFast(bool b)
 {
@@ -61,7 +56,6 @@ void BipedDef::SetGroupIndex(int16 i)
 	LThighPoly.filter.groupIndex		= i;
 	RThighPoly.filter.groupIndex		= i;
 	PelvisPoly.filter.groupIndex		= i;
-	StomachPoly.filter.groupIndex		= i;
 	ChestPoly.filter.groupIndex		= i;
 	NeckPoly.filter.groupIndex			= i;
 	HeadCirc.filter.groupIndex			= i;
@@ -82,7 +76,6 @@ void BipedDef::SetLinearDamping(float f)
 	LThighDef.linearDamping		= f;
 	RThighDef.linearDamping		= f;
 	PelvisDef.linearDamping		= f;
-	StomachDef.linearDamping	= f;
 	ChestDef.linearDamping		= f;
 	NeckDef.linearDamping		= f;
 	HeadDef.linearDamping		= f;
@@ -103,7 +96,6 @@ void BipedDef::SetAngularDamping(float f)
 	LThighDef.angularDamping	= f;
 	RThighDef.angularDamping	= f;
 	PelvisDef.angularDamping	= f;
-	StomachDef.angularDamping	= f;
 	ChestDef.angularDamping		= f;
 	NeckDef.angularDamping		= f;
 	HeadDef.angularDamping		= f;
@@ -123,8 +115,7 @@ void BipedDef::SetMotorTorque(float f)
 	RKneeDef.maxMotorTorque		= f;
 	LHipDef.maxMotorTorque			= f;
 	RHipDef.maxMotorTorque			= f;
-	LowerAbsDef.maxMotorTorque		= f;
-	UpperAbsDef.maxMotorTorque		= f;
+	AbsDef.maxMotorTorque		= f;
 	LowerNeckDef.maxMotorTorque	= f;
 	UpperNeckDef.maxMotorTorque	= f;
 	LShoulderDef.maxMotorTorque	= f;
@@ -143,8 +134,7 @@ void BipedDef::SetMotorSpeed(float f)
 	RKneeDef.motorSpeed			= f;
 	LHipDef.motorSpeed			= f;
 	RHipDef.motorSpeed			= f;
-	LowerAbsDef.motorSpeed		= f;
-	UpperAbsDef.motorSpeed		= f;
+	AbsDef.motorSpeed		= f;
 	LowerNeckDef.motorSpeed		= f;
 	UpperNeckDef.motorSpeed		= f;
 	LShoulderDef.motorSpeed		= f;
@@ -164,7 +154,6 @@ void BipedDef::SetDensity(float f)
 	LThighPoly.density			= f;
 	RThighPoly.density			= f;
 	PelvisPoly.density			= f;
-	StomachPoly.density			= f;
 	ChestPoly.density			= f;
 	NeckPoly.density			= f;
 	HeadCirc.density			= f;
@@ -185,7 +174,6 @@ void BipedDef::SetRestitution(float f)
 	LThighPoly.restitution		= f;
 	RThighPoly.restitution		= f;
 	PelvisPoly.restitution		= f;
-	StomachPoly.restitution		= f;
 	ChestPoly.restitution		= f;
 	NeckPoly.restitution		= f;
 	HeadCirc.restitution		= f;
@@ -215,8 +203,7 @@ void BipedDef::SetLimit(bool b)
 	RKneeDef.enableLimit		= b;
 	LHipDef.enableLimit			= b;
 	RHipDef.enableLimit			= b;
-	LowerAbsDef.enableLimit		= b;
-	UpperAbsDef.enableLimit		= b;
+	AbsDef.enableLimit		= b;
 	LowerNeckDef.enableLimit	= b;
 	UpperNeckDef.enableLimit	= b;
 	LShoulderDef.enableLimit	= b;
@@ -245,8 +232,7 @@ void BipedDef::SetMotor(bool b)
 	RKneeDef.enableMotor		= b;
 	LHipDef.enableMotor			= b;
 	RHipDef.enableMotor			= b;
-	LowerAbsDef.enableMotor		= b;
-	UpperAbsDef.enableMotor		= b;
+	AbsDef.enableMotor		    = b;
 	LowerNeckDef.enableMotor	= b;
 	UpperNeckDef.enableMotor	= b;
 	LShoulderDef.enableMotor	= b;
@@ -293,19 +279,13 @@ void BipedDef::DefaultVertices()
 		PelvisPoly.vertices[3] = k_scale * b2Vec2(.112f,.233f);
 		PelvisPoly.vertices[4] = k_scale * b2Vec2(.067f,.152f);
 	}
-	{	// stomach
-		StomachPoly.vertexCount = 4;
-		StomachPoly.vertices[0] = k_scale * b2Vec2(.088f,.043f);
-		StomachPoly.vertices[1] = k_scale * b2Vec2(.284f,.043f);
-		StomachPoly.vertices[2] = k_scale * b2Vec2(.295f,.231f);
-		StomachPoly.vertices[3] = k_scale * b2Vec2(.100f,.231f);
-	}
+
 	{	// chest
 		ChestPoly.vertexCount = 4;
 		ChestPoly.vertices[0] = k_scale * b2Vec2(.091f,.042f);
 		ChestPoly.vertices[1] = k_scale * b2Vec2(.283f,.042f);
-		ChestPoly.vertices[2] = k_scale * b2Vec2(.177f,.289f);
-		ChestPoly.vertices[3] = k_scale * b2Vec2(.065f,.289f);
+		ChestPoly.vertices[2] = k_scale * b2Vec2(.177f,.481f);
+		ChestPoly.vertices[3] = k_scale * b2Vec2(.065f,.481f);
 	}
 	{	// head
 		HeadCirc.radius = k_scale * .115f;
@@ -366,7 +346,7 @@ void BipedDef::DefaultJoints()
 		LKneeDef.localAnchor1	= RKneeDef.localAnchor1		= anchor - LCalfDef.position;
 		LKneeDef.localAnchor2	= RKneeDef.localAnchor2		= anchor - LThighDef.position;
 		LKneeDef.referenceAngle	= RKneeDef.referenceAngle	= 0.0f;
-		LKneeDef.lowerAngle		= RKneeDef.lowerAngle		= 0;
+		LKneeDef.lowerAngle		= RKneeDef.lowerAngle		= 0.0f;
 		LKneeDef.upperAngle		= RKneeDef.upperAngle		= 2.61799388f;
 	}
 
@@ -380,29 +360,18 @@ void BipedDef::DefaultJoints()
 		LHipDef.localAnchor2	= RHipDef.localAnchor2		= anchor - PelvisDef.position;
 		LHipDef.referenceAngle	= RHipDef.referenceAngle	= 0.0f;
 		LHipDef.lowerAngle		= RHipDef.lowerAngle		= -2.26892803f;
-		LHipDef.upperAngle		= RHipDef.upperAngle		= 0;
+		LHipDef.upperAngle		= RHipDef.upperAngle		= 0.5f;
 	}
 
 	//b.LowerAbsDef.body1		= Pelvis;
 	//b.LowerAbsDef.body2		= Stomach;
 	{	// lower abs
 		b2Vec2 anchor = k_scale * b2Vec2(.035f,.135f);
-		LowerAbsDef.localAnchor1	= anchor - PelvisDef.position;
-		LowerAbsDef.localAnchor2	= anchor - StomachDef.position;
-		LowerAbsDef.referenceAngle	= 0.0f;
-		LowerAbsDef.lowerAngle		= -0.523598776f;
-		LowerAbsDef.upperAngle		= 0.523598776f;
-	}
-
-	//b.UpperAbsDef.body1		= Stomach;
-	//b.UpperAbsDef.body2		= Chest;
-	{	// upper abs
-		b2Vec2 anchor = k_scale * b2Vec2(.045f,.320f);
-		UpperAbsDef.localAnchor1	= anchor - StomachDef.position;
-		UpperAbsDef.localAnchor2	= anchor - ChestDef.position;
-		UpperAbsDef.referenceAngle	= 0.0f;
-		UpperAbsDef.lowerAngle		= -0.523598776f;
-		UpperAbsDef.upperAngle		= 0.174532925f;
+		AbsDef.localAnchor1	= anchor - PelvisDef.position;
+		AbsDef.localAnchor2	= anchor - ChestDef.position;
+		AbsDef.referenceAngle	= 0.0f;
+		AbsDef.lowerAngle		= 0;//-0.523598776f;
+		AbsDef.upperAngle		= 0;//0.523598776f;
 	}
 
 	//b.LowerNeckDef.body1	= Chest;
@@ -412,8 +381,8 @@ void BipedDef::DefaultJoints()
 		LowerNeckDef.localAnchor1	= anchor - ChestDef.position;
 		LowerNeckDef.localAnchor2	= anchor - NeckDef.position;
 		LowerNeckDef.referenceAngle	= 0.0f;
-		LowerNeckDef.lowerAngle		= -0.174532925f;
-		LowerNeckDef.upperAngle		= 0.174532925f;
+		LowerNeckDef.lowerAngle		= 0.0f;//-0.174532925f;
+		LowerNeckDef.upperAngle		= 0.0f;//0.174532925f;
 	}
 
 	//b.UpperNeckDef.body1	= Chest;
@@ -437,7 +406,7 @@ void BipedDef::DefaultJoints()
 		LShoulderDef.localAnchor2	= RShoulderDef.localAnchor2		= anchor - LUpperArmDef.position;
 		LShoulderDef.referenceAngle	= RShoulderDef.referenceAngle	= 0.0f;
 		LShoulderDef.lowerAngle		= RShoulderDef.lowerAngle		= -1.04719755f;
-		LShoulderDef.upperAngle		= RShoulderDef.upperAngle		= 3.14159265f;
+		LShoulderDef.upperAngle		= RShoulderDef.upperAngle		= 1.04719755f;
 	}
 
 	//b.LElbowDef.body1		= LForearm;
@@ -449,8 +418,8 @@ void BipedDef::DefaultJoints()
 		LElbowDef.localAnchor1		= RElbowDef.localAnchor1	= anchor - LForearmDef.position;
 		LElbowDef.localAnchor2		= RElbowDef.localAnchor2	= anchor - LUpperArmDef.position;
 		LElbowDef.referenceAngle	= RElbowDef.referenceAngle	= 0.0f;
-		LElbowDef.lowerAngle		= RElbowDef.lowerAngle		= -2.7925268f;
-		LElbowDef.upperAngle		= RElbowDef.upperAngle		= 0;
+		LElbowDef.lowerAngle		= RElbowDef.lowerAngle		= -2.2f;
+		LElbowDef.upperAngle		= RElbowDef.upperAngle		= -2.1;
 	}
 
 	//b.LWristDef.body1		= LHand;
@@ -468,23 +437,39 @@ void BipedDef::DefaultJoints()
 }
 
 //Separacion de izq y derecha Tate
+/*void BipedDef::DefaultPositions()
+{
+        LFootDef.position                                                                       = k_scale * b2Vec2(-.147f,-.901f);
+        RFootDef.position                                                                       = k_scale * b2Vec2(.122f,-.901f);
+        LCalfDef.position                                                                       = k_scale * b2Vec2(-.202f,-.771f);
+        RCalfDef.position                                                                       = k_scale * b2Vec2(.177f,-.771f);
+        LThighDef.position                                                                      = k_scale * b2Vec2(-.242f,-.391f);
+        RThighDef.position                                                                      = k_scale * b2Vec2(.217f,-.391f);
+        LUpperArmDef.position                                                           = k_scale * b2Vec2(-.092f,.228f);
+        RUpperArmDef.position                                                           = k_scale * b2Vec2(.187f,.228f);
+        LForearmDef.position                                                            = k_scale * b2Vec2(-.082f,-.011f);
+        RForearmDef.position                                                            = k_scale * b2Vec2(.177f,-.011f);
+        LHandDef.position                                                                       = k_scale * b2Vec2(-.077f,-.136f);
+        RHandDef.position                                                                       = k_scale * b2Vec2(.172f,-.136f);
+        PelvisDef.position                                                                      = k_scale * b2Vec2(-.150f,-0.101f);
+        ChestDef.position                                                                       = k_scale * b2Vec2(-.142f,.088f);//= k_scale * b2Vec2(-.017f,.252f);
+        NeckDef.position                                                                        = k_scale * b2Vec2(-.017f,.488f);
+        HeadDef.position                                                                        = k_scale * b2Vec2(.110f,.708f);
+}*/
 void BipedDef::DefaultPositions()
 {
-	LFootDef.position									= k_scale * b2Vec2(-.147f,-.901f);
-	RFootDef.position									= k_scale * b2Vec2(.122f,-.901f);
-	LCalfDef.position									= k_scale * b2Vec2(-.202f,-.771f);
-	RCalfDef.position									= k_scale * b2Vec2(.177f,-.771f);
-	LThighDef.position									= k_scale * b2Vec2(-.242f,-.391f);
-	RThighDef.position									= k_scale * b2Vec2(.217f,-.391f);
-	LUpperArmDef.position								= k_scale * b2Vec2(-.092f,.228f);
-	RUpperArmDef.position								= k_scale * b2Vec2(.187f,.228f);
-	LForearmDef.position								= k_scale * b2Vec2(-.082f,-.011f);
-	RForearmDef.position								= k_scale * b2Vec2(.177f,-.011f);
-	LHandDef.position									= k_scale * b2Vec2(-.077f,-.136f);
-	RHandDef.position									= k_scale * b2Vec2(.172f,-.136f);
-	PelvisDef.position									= k_scale * b2Vec2(-.085f,-.071f);
-	StomachDef.position									= k_scale * b2Vec2(-.027f,.058f);
-	ChestDef.position									= k_scale * b2Vec2(-.017f,.252f);
-	NeckDef.position									= k_scale * b2Vec2(-.017f,.488f);
-	HeadDef.position									= k_scale * b2Vec2(.110f,.708f);
+	LFootDef.position		= k_scale * b2Vec2(-.122f,-.901f);
+	RFootDef.position		= k_scale * b2Vec2(.222f,-.901f);
+	LCalfDef.position		= k_scale * b2Vec2(-.177f,-.771f);
+	RCalfDef.position		= k_scale * b2Vec2(.277f,-.771f);
+	LThighDef.position		= k_scale * b2Vec2(-.217f,-.391f);
+	RThighDef.position		= k_scale * b2Vec2(.317f,-.391f);
+	LUpperArmDef.position	= RUpperArmDef.position		= k_scale * b2Vec2(-.127f,.228f);
+	LForearmDef.position	= RForearmDef.position		= k_scale * b2Vec2(-.117f,-.011f);
+	LHandDef.position		= RHandDef.position			= k_scale * b2Vec2(-.112f,-.136f);
+	PelvisDef.position									= k_scale * b2Vec2(-.177f,-.101f);
+	ChestDef.position									= k_scale * b2Vec2(-.142f,.088f);
+	NeckDef.position									= k_scale * b2Vec2(-.102f,.518f);
+	HeadDef.position									= k_scale * b2Vec2(.022f,.738f);
 }
+
