@@ -21,6 +21,8 @@
 
 #include "Biped.h"
 #include<iostream>
+#include "timer.h"
+#include <time.h>
 
 using namespace std;
 
@@ -29,18 +31,17 @@ class BipedTest : public Test
 public:
 
     int distancia;
-    int action [4];
-    int actions[16][4];
-    float w0,w1,w2;
-    int x1,x2,currAction;
-    int inicio;
-
-    struct state{
-        state *next;
-        int x1, x2, currAction;
-    };
-
-    state *head;
+    int action [2];
+    int qTable [3][3];
+    int estadoActual;
+    int posActual;
+    int estadoAnt;
+    int acciones[3][3];
+    int listaAcciones[100];
+    timer t;
+    int contador;
+    float gamma;
+    float temperatura;
 
     BipedTest()
 	{
@@ -56,48 +57,47 @@ public:
 			sd.density = 0.0f;
 			sd.restitution = k_restitution;
 
+//			sd.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
+//			body->CreateShape(&sd);
+
+//			sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
+//			body->CreateShape(&sd);
+
 			sd.SetAsBox(0.5f, 100.0f, b2Vec2(0.0f, -10.0f), 0.5f * b2_pi);
 			body->CreateShape(&sd);
+
+			//sd.SetAsBox(0.1f, 10.0f, b2Vec2(0.0f, 10.0f), -0.5f * b2_pi);
+			//body->CreateShape(&sd);
 		}
 
+		temperatura = 0.9f;
+        gamma = 0.5f;
+		estadoActual = 0;
+		estadoAnt = 0;
+		posActual = 0;
+		contador = 0;
+		acciones = {{'s','q','w'},{'s','q','w'},{'s','q','w'}};
+//		QLearning();
+		escogerAccion(estadoActual);
 		m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
 		distancia = m_biped->Head->GetPosition().x;
-		initActions();
-		//printActionsTable();
-		w0 = w1 = w2 = 1;
-		x1 = xOne();
-		x2 = xTwo();
-		currAction = 0;
-		head = new state;
-		UnityTest();
-		addState();
-		inicio = 0;
-		//setAction();
-		//updateWeights();
+        t.start();
+		InitQtable();
+		intToBinary(10);
+		printf("\n");
+		printQtable();
+		ejecuta(contador);
+
 	}
 
 	~BipedTest()
 	{
-        state* temp = head;
-        state* del = head;
-        if(temp){
-            if(!temp->next){
-                //printf("Aqui %d\n",temp->value);
-                free(del);
-            }
-            else{
-                //printf("aca\n");
-                temp=temp->next;
-                for(;temp;temp=temp->next){
-                    free(del);
-                    del=temp;
-                }
-                free(del);
-            }
-        }
-        head=NULL;
-        delete m_biped;
+		delete m_biped;
 	}
+
+    inline double closed_interval_rand(double x0, double x1){
+        return x0 + (x1 - x0) * rand() / ((double) RAND_MAX);
+    }
 
 	void Keyboard(unsigned char key){
 
@@ -120,6 +120,8 @@ public:
 				break;
             case 'j': m_biped->~Biped();
                         m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
+                        break;
+            break;
 		}
 	}
 
@@ -151,15 +153,190 @@ public:
 		distancia = m_biped->Head->GetPosition().x;
 		DrawString(5, m_textLine, "distancia = %d", (int)distancia);
 		m_textLine += 15;
-		if(inicio == 0)
-            setAction();
-        inicio=1;
 	}
 
-    void initActions(){
-        int Q,W,O,P;
-        Q = W = O = P = 1;
-        for(int i = 0; i < 16; i++){
+	void escogerAccion(int estadoAct){
+	    int max = 0;
+	    int posTemp = 0;
+        for(int i = 0; i< 3;i++){
+            if(qTable[estadoAct][i] >= max){
+                max = qTable[estadoAct][i];
+                posTemp = i;
+            }
+        }
+//        cout << "estadoActual: " << estadoAct << "POS: " << pos << "ACCION: " << acciones[estadoAct][pos] << endl;
+
+        float randy = closed_interval_rand(0,1);
+        int posRand = (int)closed_interval_rand(0,3);
+
+        if(temperatura >= randy){
+            posActual = posRand;
+            cout << "random " << "posRand: " << posRand << endl;
+        }
+        else{
+            posActual = posTemp;
+            cout << "mejor " << "posMejor: " << posTemp << endl;
+        }
+
+        listaAcciones[contador] = acciones[estadoAct][posActual];
+
+
+	}
+
+    //Prende motores dependiendo de la accion
+    void doAction(){
+        if(action[0]== 0 && action[1] == 0){
+            m_biped->UnSetMotorQW();
+            }else{
+            if(action[0] == 1)
+                m_biped->SetMotorQ();
+            else
+                m_biped->SetMotorW();
+            }
+//            if(action[2]== 0 && action[3] == 0){
+//            m_biped->UnSetMotorOP();
+//            }else{
+//            if(action[2] == 1)
+//                m_biped->SetMotorO();
+//            else
+//                m_biped->SetMotorP();
+//            }
+    }
+
+    //estados finales y su respectivo procesamiento
+    void episodio(){
+        int fall = 0;
+	    for (int32 i = 0; i < m_pointCount; ++i)
+		{
+			ContactPoint* point = m_points + i;
+
+			b2Body* body1 = point->shape1->GetBody();
+			b2Body* body2 = point->shape2->GetBody();
+			int bp1 = (int)body1->GetUserData();
+			int bp2 = (int)body2->GetUserData();
+
+			if (bp1 > 6 || bp2 > 6)
+			{
+			    fall = 1;
+			    break;
+            }
+		}
+		//SE CAE
+		if(fall == 1 ){
+		    //ciclo final
+		    estadoAnt = estadoActual;
+            estadoActual = 0;
+            QupdateFinal(0);
+            //crear nueva instancia
+		    m_biped->~Biped();
+            m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
+            contador= 0;
+            ejecuta(contador);
+            temperatura = temperatura * 0.99;
+            cout << "CAIDA..........................\n" << endl;
+        //GANO!!!!!!!!!!
+        }else if(distancia == 20){
+//              //ciclo final
+                estadoAnt = estadoActual;
+                estadoActual = 0;
+                QupdateFinal(100);
+                //crear nueva instancia
+                m_biped->~Biped();
+                m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
+                contador = 0;
+                ejecuta(contador);
+                temperatura = temperatura * 0.99;
+                cout << "GANO.....................\n " << endl;
+                }
+
+
+		fall = 0;
+    }
+
+    void ejecuta(int ilocal){
+        //listaAcciones = {'s', 's', 'q', 'q', 'w', 'w', 'w', 'q', 'q','w','w','q','q'};
+
+        cout << "TECLA: " << listaAcciones[contador] << endl;
+
+        switch(listaAcciones[ilocal]){
+            case 'q': action[1] = 0;
+                        action[0] = 1;
+                        break;
+            case 'w': action[0] = 0;
+                        action[1] = 1;
+                        break;
+            case 's': action[0] = 0;
+                        action[1] = 0;
+                        break;
+            default: cout << "ERROR SWITCH POSICIONES " <<  listaAcciones[ilocal] << " iLocal: " << ilocal << endl;
+
+
+        }
+
+        contador = (contador+1)%((sizeof(listaAcciones) / sizeof(int))-1);
+
+
+    }
+
+    void Qupdate(int reward){
+        qTable[estadoAnt][posActual] = reward + (gamma * max(estadoActual));
+    }
+
+    void QupdateFinal(int reward){
+        qTable[estadoAnt][posActual] = reward;
+    }
+
+    //realiza las acciones en la lista de acciones
+    void modAction(){
+        unsigned long int seconds = 1;
+        if(t.elapsedTime() >= seconds){
+            estadoAnt = estadoActual;
+            estadoActual = posActual;
+            Qupdate(distancia);
+            escogerAccion(estadoActual);
+            printQtable();
+            ejecuta(contador);
+            cout << "ESTADO ANTERIOR:  " <<  estadoAnt <<  endl;
+            cout << "ESTADO ACTUAL:  " <<  estadoActual <<  endl;
+            cout << "POSICION ACTUAL:  " <<  posActual <<  endl;
+            t.start();
+        }
+    }
+
+	float loop(){
+
+        modAction();
+        doAction();
+
+	    episodio();
+
+//        cout << (int)closed_interval_rand(0,3) << endl;
+
+		return m_biped->Head->GetPosition().x;
+	}
+
+    void  InitQtable(){
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                qTable[i][j] = 0;
+            }
+	    }
+    }
+
+    void printQtable(){
+        for(int i = 0; i < 3; i++){
+            printf("|");
+            for(int j = 0; j < 3; j++){
+                printf("%i ",qTable[i][j]);
+            }
+            printf("|\n");
+	    }
+    }
+    // Returns an integer array with the integer in binary
+	int* intToBinary(int integer){
+	    int Q,W,O,P;
+	    Q = W = O = P = 1;
+	    for(int i = 0; i <= integer; i++){
             if(i%2 == 0){
                 P = 0;
             }
@@ -185,238 +362,25 @@ public:
                 else
                     Q = 1;
             }
-            actions[i][0] = Q;
-            actions[i][1] = W;
-            actions[i][2] = O;
-            actions[i][3] = P;
-        }
-
-    }
-
-    void printActionsTable(){
-        for(int i = 0; i < 16; i++){
-            printf("|");
-            for(int j = 0; j < 4; j++){
-                printf("%i ",actions[i][j]);
-            }
-            printf("|\n");
-        }
-    }
-
-    void addState(){
-        state *newOne = (state *)malloc(sizeof(state));
-
-        if(!newOne){
-            printf("Error al alojar memoria");
-            exit(1);
-        }
-        memset(newOne,0,sizeof(newOne));
-        state *temp = head;
-        newOne -> next = NULL;
-        while(temp->next != NULL)
-            temp = temp->next;
-        temp->next = newOne;
-        newOne->x1 = x1;
-        newOne->x2 = x2;
-        newOne->currAction = currAction;
-        newOne->next = NULL;
-    }
-
-    float Vb(int w0, int w1, int w2, int x1, int x2){
-        if(x1 >= 100)
-            return 1000;
-        if(checkFall())
-            return -1000;
-        return (w0 + (w1*x1) + (w2*x2));
-    }
-
-    int xOne(){
-        return (int)distancia;
-    }
-
-    int xTwo(){
-        int slope;
-        int x = (int)m_biped->Head->GetPosition().x - (int)m_biped->Pelvis->GetPosition().x;
-        int y = (int)m_biped->Head->GetPosition().y - (int)m_biped->Pelvis->GetPosition().y;
-        if(y == 0)
-            return 90;
-        slope = x/y;
-        return slope;
-    }
-
-    void setAction(){
-        // We are going to get the best state
-        // and its x's so we are going to try
-        // so we are going to try this with all
-        // 16 possible states
-        printf("Juan");
-        for(int i = 0; i < 16; i++){
-            printf("juanito\n");
-            // First, we reset our biped
-            m_biped->~Biped();
-            m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
-            state *temp = head;
-            // We go through all the other states so we can try a new one
-            while(temp->next != NULL){
-                int* temp2 = intToBinary(temp->currAction);//temp.currAction);
-                for(int j = 0; j < 4; j++)
-                    action[j]=(int)temp2++;
-                doAction();
-                temp = temp->next;
-            }
-            // Here we set our todoaction to the value of i
-            // so it tries this posible action
-            int* temp2 = intToBinary(i);//temp.currAction);
-            for(int j = 0; j < 4; j++)
-                action[j]=(int)temp2++;
-            doAction();
-            int x1Temp = xOne();
-            int x2Temp = xTwo();
-            // If the result is better, then we save it
-            // so later we can introduce it to our linkedlist
-            if(checkFall() == 1){
-                x1 = x1Temp;
-                x2 = x2Temp;
-                currAction = i;
-                addState();
-                printf("pedro");
-                //updateWeights();
-                return;
-            }
-            else{
-                if(Vb(w0,w1,w2,x1,x2) < Vb(w0,w1,w2,x1Temp,x2Temp)){
-                    x1 = x1Temp;
-                    x2 = x2Temp;
-                    currAction = i;
-                }
-            }
-        }
-        addState();
-        setAction();
-    }
-
-    void  updateWeights(){
-        state * temp = head;
-        if(temp->next == NULL){
-            printf("Error 404");
-            return;
-        }
-        printf("intentando update");
-
-        float newW1 = 0;
-        float newW2 = 0;
-        while(head->next != NULL){
-            printf("aki1");
-            if(temp->next->next == NULL){
-                newW1 = updateWeight(Vb(w0,w1,w2,temp->next->x1,temp->next->x2),Vb(w0,w1,w2,x1,x2),x1,w1);
-                newW2 = updateWeight(Vb(w0,w1,w2,temp->next->x1,temp->next->x2),Vb(w0,w1,w2,x1,x2),x2,w2);
-                w1 = newW1;
-                w2 = newW2;
-                state * temp2 = temp->next;
-                temp->next = NULL;
-                free(temp2);
-                printf("\n\n\n\naki2\n\n\n");
-            }
-            else{
-                temp = head;
-                while(temp->next->next != NULL){
-                    temp = temp->next;
-                }
-                state * temp2 = temp->next;
-                newW1 = updateWeight(Vb(w0,w1,w2,temp->next->x1,temp->next->x2),Vb(w0,w1,w2,x1,x2),x1,w1);
-                newW2 = updateWeight(Vb(w0,w1,w2,temp->next->x1,temp->next->x2),Vb(w0,w1,w2,x1,x2),x2,w2);
-                w1 = newW1;
-                w2 = newW2;
-                temp->next = NULL;
-                free(temp2);
-                printf("aki3");
-            }
-        }
-        printf("updateados");
-    }
-
-    float updateWeight(float Vtrain, float Vb, int xi, float wi){
-        float newWi = 0;
-
-        newWi = (wi + (0.1 * (Vtrain - Vb) * xi));
-
-        return newWi;
-    }
-
-    void UnityTest(){
-
-        /*int temp2 = 0;// temp->currAction;
-        printf("temp2: %i\n",temp2);
-        int* temp = intToBinary(temp2);//temp.currAction);
-        printf("ArregloI: ");
-        for(int j = 0; j < 4; j++){
-            action[j]=temp[j];
-            printf("%i ",temp[j]);
-        }
-        temp = intToBinary(temp2);
-        printf("\nArreglo: ");
-        for(int j = 0; j < 4; j++){
-            printf("%i ",action[j]);
-        }
-        printf("X1 = %i   X2= %i\n",xOne(),xTwo());
-        printf("headx = %i  hipx= %i  headx - hipx: %i\n",(int)m_biped->Head->GetPosition().x , (int)m_biped->Pelvis->GetPosition().x,(int)m_biped->Head->GetPosition().x - (int)m_biped->Pelvis->GetPosition().x);
-        printf("heady = %i  hipy= %i  heady - hipy: %i\n",(int)m_biped->Head->GetPosition().y , (int)m_biped->Pelvis->GetPosition().y,(int)m_biped->Head->GetPosition().y - (int)m_biped->Pelvis->GetPosition().y);
-        printf("m = %f\n",(m_biped->Head->GetPosition().x - m_biped->Pelvis->GetPosition().x)/(m_biped->Head->GetPosition().y - m_biped->Pelvis->GetPosition().y));
-        printf("\n");*/
-
-    }
-
-    void doAction(){
-        if(action[0]== 0 && action[1] == 0){
-            m_biped->UnSetMotorQW();
-	    }else{
-            if(action[0] == 1)
-                m_biped->SetMotorQ();
-            else
-                m_biped->SetMotorW();
 	    }
-	    if(action[2]== 0 && action[3] == 0){
-            m_biped->UnSetMotorOP();
-	    }else{
-            if(action[2] == 1)
-                m_biped->SetMotorO();
-            else
-                m_biped->SetMotorP();
-	    }
-    }
-
-    int checkFall(){
-        int bol = 0;
-        for (int32 i = 0; i < m_pointCount; ++i){
-			ContactPoint* point = m_points + i;
-
-			b2Body* body1 = point->shape1->GetBody();
-			b2Body* body2 = point->shape2->GetBody();
-			int bp1 = (int)body1->GetUserData();
-			int bp2 = (int)body2->GetUserData();
-            printf("bp1 = %i   bp2 %i",bp1,bp2);
-			if (bp1 > 6 || bp2 > 6){
-			    bol = 1;
-			    return bol;
-            }
-		}
-		return bol;
-    }
-
-	float loop(){
-	    return m_biped->Head->GetPosition().x;
+	    int temp [4];// = new int [4];
+	    temp[0] = Q;
+	    temp[1] = W;
+	    temp[2] = O;
+	    temp[3] = P;
+	    return temp;
 	}
 
-    // Returns an integer array with the integer in binary
-	int* intToBinary(int integer){
-	    if(integer > 15)
-            return NULL;
-	    int *temp = new int[4];
-	    for(int i = 3; i >= 0; i--){
-            temp[i] = integer%2;
-            integer = integer/2;
-	    }
-        return temp;
+    //max valor de la tabla de las acciones del estado actual
+	int max(int EA){
+        int max = 0;
+
+        for(int i = 0; i < 3;i++){
+            if(qTable[EA][i] >= max)
+                max = qTable[EA][i];
+        }
+
+        return max;
 	}
 
 	static Test* Create()
