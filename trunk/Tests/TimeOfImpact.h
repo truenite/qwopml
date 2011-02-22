@@ -92,7 +92,7 @@ public:
 		int32 vertexCount = m_shape2->GetVertexCount();
 		b2Vec2 vertices[b2_maxPolygonVertices];
 		const b2Vec2* localVertices;
-		
+
 		localVertices = m_shape2->GetVertices();
 		for (int32 i = 0; i < vertexCount; ++i)
 		{
