@@ -171,7 +171,7 @@ public:
 
         if(temperatura >= randy){
             posActual = posRand;
-            cout << "random " << "posRand: " << posRand << endl;
+            cout << "random " << "posRand: " << posRand << "temp:" << temperatura <<  endl;
         }
         else{
             posActual = posTemp;
@@ -235,7 +235,7 @@ public:
             temperatura = temperatura * 0.99;
             cout << "CAIDA..........................\n" << endl;
         //GANO!!!!!!!!!!
-        }else if(distancia == 20){
+        }else if(distancia == 40){
 //              //ciclo final
                 estadoAnt = estadoActual;
                 estadoActual = 0;
