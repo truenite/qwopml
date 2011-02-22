@@ -58,10 +58,8 @@ public:
 
 		m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
 		distancia = m_biped->Head->GetPosition().x;
-		InitQtable();
 		intToBinary(10);
 		printf("\n");
-		printQtable();
 
 
 	}
@@ -169,26 +167,8 @@ public:
 		return m_biped->Head->GetPosition().x;
 	}
 
-    void  InitQtable(){
-        for(int i = 0; i < 16; i++){
-            for(int j = 0; j < 16; j++){
-                if(i == 3 || i == 7 || i > 10 || j == 3 || j == 7 || j > 10)
-                    qTable[i][j] = -1000;
-                else
-                    qTable[i][j] = 0;
-            }
-	    }
-    }
 
-    void printQtable(){
-        for(int i = 0; i < 16; i++){
-            printf("|");
-            for(int j = 0; j < 16; j++){
-                printf("%i ",qTable[i][j]);
-            }
-            printf("|\n");
-	    }
-    }
+
     // Returns an integer array with the integer in binary
 	int* intToBinary(int integer){
 	    int Q,W,O,P;
@@ -226,6 +206,25 @@ public:
 	    temp[2] = O;
 	    temp[3] = P;
 	    return temp;
+	}
+
+	//Funcion que calcula el valor actual de los pesos con sus respectivas x's
+	//Vb se calcula antes de actualizar los pesos
+	int Vb(int w0, int w1, int w2, int x1, int x2){
+        return (w0 + (w1*x1) + (w2*x2));
+	}
+
+    //Funcion para actualizar los pesos
+    //Vtrain es el valor de la funcion Vb en el paso siguiente de la iteracion
+    //Vb es el valor de la funcion Vb con os valores actuales
+    //xi es la equis a la que se le esta asignando el peso
+    //wi es el peso que se va a calcular en el estado actual
+	int updateWeights(int Vtrain, int Vb, int xi, int wi){
+        int newWi = 0;
+
+        newWi = (wi + (0.1 * (Vtrain - Vb) * xi));
+
+        return newWi;
 	}
 
 	static Test* Create()
