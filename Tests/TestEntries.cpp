@@ -25,66 +25,12 @@
 #include "freeglut/GL/glut.h"
 #endif
 
-#include "ApplyForce.h"
+#include "BipedLMSTest.h"
 #include "BipedTest.h"
-#include "Bridge.h"
-#include "BroadPhaseTest.h"
-#include "Car.h"
-#include "CCDTest.h"
-#include "Chain.h"
-#include "ContactCallbackTest.h"
-#include "CollisionFiltering.h"
-#include "CollisionProcessing.h"
-#include "CompoundShapes.h"
-#include "DistanceTest.h"
-#include "Dominos.h"
-#include "ElasticBody.h"
-#include "Gears.h"
-#include "MotorsAndLimits.h"
-#include "PolyCollision.h"
-#include "PolyShapes.h"
-#include "Pulleys.h"
-#include "Pyramid.h"
-#include "SensorTest.h"
-#include "ShapeEditing.h"
-#include "SliderCrank.h"
-#include "TheoJansen.h"
-#include "TimeOfImpact.h"
-#include "VaryingFriction.h"
-#include "VaryingRestitution.h"
-#include "VerticalStack.h"
-#include "Web.h"
 
 TestEntry g_testEntries[] =
 {
-	
-	{"Biped Test", BipedTest::Create},
-	{"Theo Jansen's Walker", TheoJansen::Create},
-	{"Contact Callback Test", ContactCB::Create},
-	{"Polygon Shapes", PolyShapes::Create},
-	{"Pyramid", Pyramid::Create},
-	{"Web", Web::Create},
-	{"Varying Friction", VaryingFriction::Create},
-	{"Varying Restitution", VaryingRestitution::Create},
-	{"Bridge", Bridge::Create},
-	{"Dominos", Dominos::Create},
-	{"CCD Test", CCDTest::Create},
-	{"Sensor Test", SensorTest::Create},
-	{"Car", Car::Create},
-	{"Gears", Gears::Create},
-	{"Slider Crank", SliderCrank::Create},
-	{"Compound Shapes", CompoundShapes::Create},
-	{"Chain", Chain::Create},
-	{"Collision Processing", CollisionProcessing::Create},
-	{"Collision Filtering", CollisionFiltering::Create},
-	{"Motors and Limits", MotorsAndLimits::Create},
-	{"Apply Force", ApplyForce::Create},
-	{"Pulleys", Pulleys::Create},
-	{"Shape Editing", ShapeEditing::Create},
-	{"Time of Impact", TimeOfImpact::Create},
-	{"Distance Test", DistanceTest::Create},
-	{"Broad Phase", BroadPhaseTest::Create},
-	{"PolyCollision", PolyCollision::Create},
-	{"Elastic Body", ElasticBody::Create},
+    {"Biped Test", BipedTest::Create},
+	{"Biped LSM", BipedLMSTest::Create},
 	{NULL, NULL}
 };
