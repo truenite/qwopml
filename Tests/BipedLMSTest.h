@@ -38,6 +38,8 @@ public:
     timer t;
     int ite, ite2, strucLenght, stage, terminal;
     double wait;
+    int caido;
+    int cayo;
     Settings* set;
 
     struct state{
@@ -84,7 +86,6 @@ public:
 		head->currAction = 0;
 		head->next = NULL;
 		temporal = head;
-		UnityTest();
         inicio = 0;
 		ite = 0;
 		ite2 = 0;
@@ -94,6 +95,8 @@ public:
 		addState();
 		wait = 1.5;
 		t.start();
+		caido = 0;
+		cayo = 0;
 		terminal = 0;
 	}
 
@@ -160,6 +163,10 @@ public:
             actions[i][1] = W;
             actions[i][2] = O;
             actions[i][3] = P;
+            /*actions[i][0] = 1;
+            actions[i][1] = 1;
+            actions[i][2] = 0;
+            actions[i][3] = 0;*/
         }
 
     }
@@ -193,13 +200,9 @@ public:
 
     float Vb(float w0, float w1, float w2, float x1, float x2){
         if(x1 >= 100)
-            return 1000;
-        if(x1 <= -1000 && x2 <= -1000){
-            x1+=1000;
-            x2+=1000;
-            x1*=-1;
-            x2*=-1;
-            //printf("x1 = %f  x2 = %f\n",x1,x2);
+            return 10000000;
+        if(caido == 1){
+            caido = 0;
             return 1;
         }
         return (w0 + (w1*x1) + (w2*x2));
@@ -214,12 +217,15 @@ public:
         float x = m_biped->Head->GetPosition().x - m_biped->Pelvis->GetPosition().x;
         float y = m_biped->Head->GetPosition().y - m_biped->Pelvis->GetPosition().y;
         if(x == 0)
-            return 99999999 ;
+            return 99999999;
         slope = y/x;
         //slope = sqrt((slope*slope));
         //printf("y1 = %f   y2= %f\n",m_biped->Head->GetPosition().y , m_biped->Pelvis->GetPosition().y);
         //printf("slope %f   y = %f   x= %f\n",slope,y,x);
-        return slope;
+        if(slope > .7 && slope < 50 && x >= 0 && y >= 0)
+            return 10;
+        else
+            return 0;
     }
 
     void getToLastState(){
@@ -232,7 +238,6 @@ public:
                 for(int k = 0; k < 4; k++){
                     action[k]=actions[0][k];
                 }
-                t.start();
                 ite++;
                 return;
             }
@@ -257,24 +262,25 @@ public:
     }
 
     void calculateBest(){
-        if(ite2 > 0 && stage == 2){
+        if(stage == 2){
+            printf("cayo %i\n",cayo);
             float x1Temp = xOne();
             float x2Temp = xTwo();
-            /*if(checkFall() == 1){
-                addState();
-                x1 *= -1;
-                x2 *= -1;
-                x1 -= 1000;
-                x2 -= 1000;
+            if(caido == 0)
+                cayo = checkFall();
+            if(cayo == 1){
+                cayo = 0;
                 currAction = ite2-1;
                 stage = 3;
                 ite2 = 0;
+                addState();
+                caido = 1;
                 updateWeights2();
                 currAction = 0;
                 x1,x2 = 0;
                 return;
             }
-            else{*/
+            else{
                 if(x1Temp>100)
                 {
                     currAction = ite2-1;
@@ -300,7 +306,7 @@ public:
                 if(ite2 == 16)
                     ite2 = 0;
                 stage = 0;
-            //}
+            }
         }
     }
 
@@ -348,127 +354,8 @@ public:
                     break;
             }
         }
-    }
-/*
-    void setAction(){
-        if(timer!= 0 && 1 >= ((unsigned long) clock() - timer) / CLOCKS_PER_SEC){
-            return;
-        }
-        x1 = 0;
-        x2 = 0;
-        int stateSize = 0;
-        for(int i = 0; i < 16; i++){
-            // First, we reset our biped
-            m_biped->~Biped();
-            m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
-            state * temp = head;
-            if(temp->next == NULL){
-                printf("Error 404");
-                exit(1);
-            }
-            temp = temp->next;
-            // We go through all the other states so we can try a new one
-            while(temp->next != NULL){
-                stateSize ++;
-                //printf("juan3 %i\n",temp->currAction);
-                for(int j = 0; j < 4; j++){
-                    action[j]=actions[temp->currAction][j];
-                }
-                float x1Temp = xOne();
-                float x2Temp = xTwo();
-                printf("xs: %f   %f\n",x1Temp,x2Temp);
-                doAction();
-                temp = temp->next;
-                x1Temp = xOne();
-                x2Temp = xTwo();
-                printf("accion: %i%i%i%i\n",action[0],action[1],action[2],action[3]);
-                printf("xs: %f   %f\n",x1,x2);
-                printf("xs: %f   %f\n",x1Temp,x2Temp);
-                printf("actual: %f\n",Vb(w0,w1,w2,x1,x2));
-                printf("temp: %f\n",Vb(w0,w1,w2,x1Temp,x2Temp));
-            }
-            for(int j = 0; j < 4; j++){
-                action[j]=actions[temp->currAction][j];
-            }
-            doAction();
-            // Here we set our todoaction to the value of i
-            // so it tries this posible action
-            for(int j = 0; j < 4; j++)
-                action[j]=actions[i][j];
-            doAction();
-            float x1Temp = xOne();
-            float x2Temp = xTwo();
-            // If the result is better, then we save it
-            // so later we can introduce it to our linkedlist
-            printf("accion: %i%i%i%i\n",action[0],action[1],action[2],action[3]);
-            printf("xs: %f   %f\n",x1,x2);
-            printf("xs: %f   %f\n",x1Temp,x2Temp);
-            printf("actual: %f\n",Vb(w0,w1,w2,x1,x2));
-            printf("temp: %f\n",Vb(w0,w1,w2,x1Temp,x2Temp));
-            if(checkFall() == 1){
-                x1 = x1Temp;
-                x2 = x2Temp;
-                currAction = i;
-                addState();
-                printf("No por favor no");
-                //updateWeights();
-                return;
-            }
-            else{
-                if(Vb(w0,w1,w2,x1,x2) < Vb(w0,w1,w2,x1Temp,x2Temp)){
-                    x1 = x1Temp;
-                    x2 = x2Temp;
-                    currAction = i;
-                }
-            }
-        }
-        printf("\n Vb = %f",Vb(w0,w1,w2,x1,x2));
-        addState();
-        iterationsAdjust --;
-        iterationsAdjust = iterationsMax;
-        if(iterationsAdjust != 0){
-            timer = clock();
-        }
-        else{
-            iterationsAdjust = iterationsMax;
-            updateWeights();
-        }
-    }
-*/
-    void  updateWeights(){
-        state * temp = head;
-        if(temp->next == NULL){
-            printf("Error 404");
-            return;
-        }
-        printf("intentando update");
-        temp = temp->next;
-        float newW1 = 0;
-        float newW2 = 0;
-        while(head->next != NULL){
-            if(temp->next->next == NULL){
-                newW1 = updateWeight(Vb(w0,w1,w2,temp->next->x1,temp->next->x2),Vb(w0,w1,w2,x1,x2),x1,w1);
-                newW2 = updateWeight(Vb(w0,w1,w2,temp->next->x1,temp->next->x2),Vb(w0,w1,w2,x1,x2),x2,w2);
-                w1 = newW1;
-                w2 = newW2;
-                state * temp2 = temp->next;
-                temp->next = NULL;
-                free(temp2);
-            }
-            else{
-                temp = head;
-                while(temp->next->next != NULL){
-                    temp = temp->next;
-                }
-                state * temp2 = temp->next;
-                newW1 = updateWeight(Vb(w0,w1,w2,temp->next->x1,temp->next->x2),Vb(w0,w1,w2,x1,x2),x1,w1);
-                newW2 = updateWeight(Vb(w0,w1,w2,temp->next->x1,temp->next->x2),Vb(w0,w1,w2,x1,x2),x2,w2);
-                w1 = newW1;
-                w2 = newW2;
-                temp->next = NULL;
-                free(temp2);
-            }
-        }
+        if(caido == 0)
+            checkFall();
     }
 
     float updateWeight(float Vtrain, float Vb, int xi, float wi){
@@ -480,28 +367,6 @@ public:
         return newWi;
     }
 
-    void UnityTest(){
-        /*
-        int temp1 = 1;// temp->currAction;
-        printf("temp2: %i\n",temp1);
-        int* temp2 = intToBinary(temp1);//temp.currAction);
-        printf("ArregloI: ");
-        for(int j = 0; j < 4; j++){
-            action[j]=temp2[j];
-            printf("%i ",temp2[j]);
-        }
-        temp2 = intToBinary(temp1);
-        printf("\nArreglo: ");
-        for(int j = 0; j < 4; j++){
-            printf("%i ",action[j]);
-        }/*
-        printf("X1 = %i   X2= %i\n",xOne(),xTwo());
-        printf("headx = %i  hipx= %i  headx - hipx: %i\n",(int)m_biped->Head->GetPosition().x , (int)m_biped->Pelvis->GetPosition().x,(int)m_biped->Head->GetPosition().x - (int)m_biped->Pelvis->GetPosition().x);
-        printf("heady = %i  hipy= %i  heady - hipy: %i\n",(int)m_biped->Head->GetPosition().y , (int)m_biped->Pelvis->GetPosition().y,(int)m_biped->Head->GetPosition().y - (int)m_biped->Pelvis->GetPosition().y);
-        printf("m = %f\n",(m_biped->Head->GetPosition().x - m_biped->Pelvis->GetPosition().x)/(m_biped->Head->GetPosition().y - m_biped->Pelvis->GetPosition().y));
-        printf("\n");*/
-
-    }
 
     void doAction(){
         if(action[0]== 0 && action[1] == 0){
@@ -532,12 +397,17 @@ public:
 			b2Body* body2 = point->shape2->GetBody();
 			int bp1 = (int)body1->GetUserData();
 			int bp2 = (int)body2->GetUserData();
-			if (bp1 > 6 || bp2 > 6){
+			if ((bp1 > 6 || bp2 > 6) && (bp1 <= 0 || bp2 <= 0)){
 			    bol = 1;
-			    return bol;
+			    if(cayo != 1){
+                    printf("bp1 %i   bp2  %i  \n",bp1,bp2);
+                }
             }
 		}
-		return bol;
+		if(cayo != 1){
+            cayo = bol;
+        }
+		//printf("caido %i",cayo);
     }
 
 	float loop(){
@@ -592,6 +462,7 @@ public:
         }
         printf("\n\n\n\nnuevos   w1 = %f   w2= %f\n\n\n\n",w1,w2);
         reset();
+        caido = 0;
         stage = 0;
         t.start();
     }

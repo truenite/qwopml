@@ -64,8 +64,8 @@ void BipedDef::SetUserData()
 	RUpperArmDef.userData	    = (void*)12;
 	LForearmDef.userData	    = (void*)13;
 	RForearmDef.userData        = (void*)14;
-	LHandDef.userData   	    = (void*)0;
-	RHandDef.userData		    = (void*)0;
+	LHandDef.userData   	    = (void*)1;
+	RHandDef.userData		    = (void*)1;
 }
 
 void BipedDef::SetGroupIndex(int16 i)
