@@ -30,7 +30,7 @@
 
 TestEntry g_testEntries[] =
 {
-    {"Biped LSM", BipedLMSTest::Create},
+    {"Biped LMS", BipedLMSTest::Create},
     {"Biped Test", BipedTest::Create},
 	{NULL, NULL}
 };
