@@ -53,55 +53,55 @@ public:
     state *temporal;
 
     BipedLMSTest()
-	{
+        {
 
-		const float32 k_restitution = 1.4f;
+                const float32 k_restitution = 1.4f;
 
-		{
-			b2BodyDef bd;
-			bd.position.Set(0.0f, 5.0f);
-			b2Body* body = m_world->CreateBody(&bd);
+                {
+                        b2BodyDef bd;
+                        bd.position.Set(0.0f, 5.0f);
+                        b2Body* body = m_world->CreateBody(&bd);
 
-			b2PolygonDef sd;
-			sd.density = 0.0f;
-			sd.restitution = k_restitution;
+                        b2PolygonDef sd;
+                        sd.density = 0.0f;
+                        sd.restitution = k_restitution;
 
-			sd.SetAsBox(0.5f, 100.0f, b2Vec2(0.0f, -10.0f), 0.5f * b2_pi);
-			body->CreateShape(&sd);
-		}
+                        sd.SetAsBox(0.5f, 100.0f, b2Vec2(0.0f, -10.0f), 0.5f * b2_pi);
+                        body->CreateShape(&sd);
+                }
 
-		m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
-		distancia = m_biped->Head->GetPosition().x;
-		initActions();
-		//printActionsTable();
-		w0 = 1;
-		w1 = 7;
-		w2 = 10;
-		x1 = xOne();
-		x2 = xTwo();
-		currAction = 0;
-		head = new state;
-		head->x1 = x1;
-		head->x2 = x2;
-		head->currAction = 0;
-		head->next = NULL;
-		temporal = head;
+                m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
+                distancia = m_biped->Head->GetPosition().x;
+                initActions();
+                //printActionsTable();
+                w0 = 1;
+                w1 = 7;
+                w2 = 10;
+                x1 = xOne();
+                x2 = xTwo();
+                currAction = 0;
+                head = new state;
+                head->x1 = x1;
+                head->x2 = x2;
+                head->currAction = 0;
+                head->next = NULL;
+                temporal = head;
         inicio = 0;
-		ite = 0;
-		ite2 = 0;
-		strucLenght = 0;
-		stage = 0;
-		currAction = 0;
-		addState();
-		wait = 1.5;
-		t.start();
-		caido = 0;
-		cayo = 0;
-		terminal = 0;
-	}
+                ite = 0;
+                ite2 = 0;
+                strucLenght = 0;
+                stage = 0;
+                currAction = 0;
+                addState();
+                wait = 1.0;
+                t.start();
+                caido = 0;
+                cayo = 0;
+                terminal = 0;
+        }
 
-	~BipedLMSTest()
-	{
+        ~BipedLMSTest()
+        {
         state* temp = head;
         state* del = head;
         if(temp){
@@ -119,16 +119,16 @@ public:
         }
         head=NULL;
         delete m_biped;
-	}
+        }
 
-	void Step(Settings* settings)
-	{
+        void Step(Settings* settings)
+        {
         set = settings;
-		Test::Step(settings);
-		distancia = m_biped->Head->GetPosition().x;
-		DrawString(5, m_textLine, "distancia = %d", (int)distancia);
-		m_textLine += 15;
-	}
+                Test::Step(settings);
+                distancia = m_biped->Head->GetPosition().x;
+                DrawString(5, m_textLine, "distancia = %d", (int)distancia);
+                m_textLine += 15;
+        }
 
     void initActions(){
         int Q,W,O,P;
@@ -193,8 +193,8 @@ public:
         newOne->currAction = currAction;
         newOne->next = NULL;
         newOne->terminal = terminal;
-        printf("curr action %i  x1 %f, x2  %f  V(b)= %f\n",currAction,x1,x2,Vb(w0,w1,w2,x1,x2));
-        printf("curr action del nodo %i\n",newOne->currAction);
+        //("curr action %i  x1 %f, x2  %f  V(b)= %f\n",currAction,x1,x2,Vb(w0,w1,w2,x1,x2));
+        //printf("curr action del nodo %i\n",newOne->currAction);
         strucLenght++;
     }
 
@@ -230,7 +230,7 @@ public:
 
     void getToLastState(){
         if(stage == 0){
-            printf("ite %i\n",ite);
+            //printf("ite %i\n",ite);
             if(ite == 0){
                 m_biped->~Biped();
                 m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
@@ -263,7 +263,7 @@ public:
 
     void calculateBest(){
         if(stage == 2){
-            printf("cayo %i\n",cayo);
+            //printf("cayo %i\n",cayo);
             float x1Temp = xOne();
             float x2Temp = xTwo();
             if(caido == 0)
@@ -295,7 +295,7 @@ public:
                     return;
                 }
                 else{
-                    printf("Vb pas = %f  VbNueva = %f\n",Vb(w0,w1,w2,x1,x2),Vb(w0,w1,w2,x1Temp,x2Temp));
+                    //printf("Vb pas = %f  VbNueva = %f\n",Vb(w0,w1,w2,x1,x2),Vb(w0,w1,w2,x1Temp,x2Temp));
                     if(Vb(w0,w1,w2,x1,x2) < Vb(w0,w1,w2,x1Temp,x2Temp)){
                         //printf("si\n");
                         x1 = x1Temp;
@@ -312,7 +312,7 @@ public:
 
     void doLastState(){
         if(stage == 1){
-            printf("dolast %i\n",ite2);
+            //printf("dolast %i\n",ite2);
             for(int k = 0; k < 4; k++){
                 action[k] = actions[ite2][k];
             }
@@ -322,7 +322,7 @@ public:
                 }
                 stage = 2;
                 ite2++;
-                printf("stage 0! ite:%i  TERMINO\n",ite);
+                //printf("stage 0! ite:%i  TERMINO\n",ite);
                 addState();
                 currAction = 0;
                 x1 = 0;
@@ -363,7 +363,7 @@ public:
 
         newWi = (wi + (0.01 * (Vtrain - Vb) * xi));
 
-        printf("=====updateWeight NEW w%f =====\n",newWi);
+        //printf("=====updateWeight NEW w%f =====\n",newWi);
         return newWi;
     }
 
@@ -371,50 +371,50 @@ public:
     void doAction(){
         if(action[0]== 0 && action[1] == 0){
             m_biped->UnSetMotorQW();
-	    }else{
+            }else{
             if(action[0] == 1)
                 m_biped->SetMotorQ();
             else
                 m_biped->SetMotorW();
-	    }
-	    if(action[2]== 0 && action[3] == 0){
+            }
+            if(action[2]== 0 && action[3] == 0){
             m_biped->UnSetMotorOP();
-	    }else{
+            }else{
             if(action[2] == 1)
                 m_biped->SetMotorO();
             else
                 m_biped->SetMotorP();
-	    }
-	    //Step(set);
+            }
+            //Step(set);
     }
 
     int checkFall(){
         int bol = 0;
         for (int32 i = 0; i < m_pointCount; ++i){
-			ContactPoint* point = m_points + i;
+                        ContactPoint* point = m_points + i;
 
-			b2Body* body1 = point->shape1->GetBody();
-			b2Body* body2 = point->shape2->GetBody();
-			int bp1 = (int)body1->GetUserData();
-			int bp2 = (int)body2->GetUserData();
-			if ((bp1 > 6 || bp2 > 6) && (bp1 <= 0 || bp2 <= 0)){
-			    bol = 1;
-			    if(cayo != 1){
-                    printf("bp1 %i   bp2  %i  \n",bp1,bp2);
+                        b2Body* body1 = point->shape1->GetBody();
+                        b2Body* body2 = point->shape2->GetBody();
+                        int bp1 = (int)body1->GetUserData();
+                        int bp2 = (int)body2->GetUserData();
+                        if ((bp1 > 6 || bp2 > 6) && (bp1 <= 0 || bp2 <= 0)){
+                            bol = 1;
+                            if(cayo != 1){
+                    //printf("bp1 %i   bp2  %i  \n",bp1,bp2);
                 }
             }
-		}
-		if(cayo != 1){
+                }
+                if(cayo != 1){
             cayo = bol;
         }
-		//printf("caido %i",cayo);
+                //printf("caido %i",cayo);
     }
 
-	float loop(){
-	    doAction();
-	    loopEd();
-	    return m_biped->Head->GetPosition().x;
-	}
+        float loop(){
+            doAction();
+            loopEd();
+            return m_biped->Head->GetPosition().x;
+        }
 
     void reset(){
         state* temp = head;
@@ -434,17 +434,17 @@ public:
         }
         currAction = 0;
         head = new state;
-		head->x1 = 0;
-		head->x2 = 0;
-		head->currAction = 0;
-		head->next = NULL;
-		x1 = 0;
-		x2 = 0;
-		addState();
-	}
+                head->x1 = 0;
+                head->x2 = 0;
+                head->currAction = 0;
+                head->next = NULL;
+                x1 = 0;
+                x2 = 0;
+                addState();
+        }
 
-	void updateWeights2(){
-	    state *tempLast = head->next;
+        void updateWeights2(){
+            state *tempLast = head->next;
         while(tempLast->next != NULL)
             tempLast = tempLast->next;
         while(head->next != tempLast){
@@ -453,14 +453,14 @@ public:
                 tempUpdate=tempUpdate->next;
             float VbNext = Vb(w0,w1,w2,tempLast->x1,tempLast->x2);
             float VbThis = Vb(w0,w1,w2,tempUpdate->x1,tempUpdate->x2);
-            printf("\n\n\nupdateWheights2   w1 = %f   w2= %f\n",w1,w2);
+            //printf("\n\n\nupdateWheights2   w1 = %f   w2= %f\n",w1,w2);
             w1 = updateWeight(VbNext,VbThis,x1,w1);
             w2 = updateWeight(VbNext,VbThis,x2,w2);
-            printf("nuevos   w1 = %f   w2= %f   wbNext %f  wbThis %f \n",w1,w2,VbNext,VbThis,x1,x2);
+            //printf("nuevos   w1 = %f   w2= %f   wbNext %f  wbThis %f \n",w1,w2,VbNext,VbThis,x1,x2);
             tempLast = tempUpdate;
 
         }
-        printf("\n\n\n\nnuevos   w1 = %f   w2= %f\n\n\n\n",w1,w2);
+        printf("nuevos   w1 = %f   w2= %f\n",w1,w2);
         reset();
         caido = 0;
         stage = 0;
@@ -469,16 +469,16 @@ public:
 
 
     // Returns an integer array with the integer in binary
-	int* intToBinary(int integer){
-	    if(integer > 15)
+        int* intToBinary(int integer){
+            if(integer > 15)
             return NULL;
-	    int *temp = new int[4];
-	    for(int i = 3; i >= 0; i--){
+            int *temp = new int[4];
+            for(int i = 3; i >= 0; i--){
             temp[i] = integer%2;
             integer = integer/2;
-	    }
+            }
         return temp;
-	}
+        }
 
     int binaryToInt(int* binary){
         int integer = 0;
@@ -488,11 +488,12 @@ public:
         integer += binary[3]*1;
         return 0;
     }
-	static Test* Create()
-	{
-		return new BipedLMSTest;
-	}
-	Biped* m_biped;
+        static Test* Create()
+        {
+                return new BipedLMSTest;
+        }
+        Biped* m_biped;
 };
+
 
 #endif

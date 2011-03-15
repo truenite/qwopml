@@ -60,10 +60,10 @@ void BipedDef::SetUserData()
 	ChestDef.userData		    = (void*)8;
 	NeckDef.userData		    = (void*)9;
 	HeadDef.userData		    = (void*)10;
-	LUpperArmDef.userData	    = (void*)11;
-	RUpperArmDef.userData	    = (void*)12;
-	LForearmDef.userData	    = (void*)13;
-	RForearmDef.userData        = (void*)14;
+	LUpperArmDef.userData	    = (void*)1;
+	RUpperArmDef.userData	    = (void*)1;
+	LForearmDef.userData	    = (void*)1;
+	RForearmDef.userData        = (void*)1;
 	LHandDef.userData   	    = (void*)1;
 	RHandDef.userData		    = (void*)1;
 }
