@@ -22,8 +22,6 @@
 #include "Biped.h"
 #include<iostream>
 
-#include <time.h>
-
 using namespace std;
 
 class BipedLMSTest : public Test
@@ -37,14 +35,15 @@ public:
     float x1,x2;
     int currAction;
     int inicio;
-    int ite, ite2, strucLenght, stage;
-    unsigned long timerA, timerB;
+    timer t;
+    int ite, ite2, strucLenght, stage, terminal;
+    double wait;
     Settings* set;
 
     struct state{
         state *next;
         float x1, x2;
-        int currAction;
+        int currAction, terminal;
     };
 
     state *head;
@@ -73,18 +72,29 @@ public:
 		distancia = m_biped->Head->GetPosition().x;
 		initActions();
 		//printActionsTable();
-		w0 = w1 = 4;
-		w2 = 4;
+		w0 = 1;
+		w1 = 7;
+		w2 = 10;
 		x1 = xOne();
 		x2 = xTwo();
 		currAction = 0;
 		head = new state;
+		head->x1 = x1;
+		head->x2 = x2;
+		head->currAction = 0;
+		head->next = NULL;
 		temporal = head;
 		UnityTest();
-		inicio = 0;
-		ite = ite2 = strucLenght = stage = 0;
+        inicio = 0;
+		ite = 0;
+		ite2 = 0;
+		strucLenght = 0;
+		stage = 0;
+		currAction = 0;
 		addState();
-		timerA = timerB = clock();
+		wait = 1.5;
+		t.start();
+		terminal = 0;
 	}
 
 	~BipedLMSTest()
@@ -93,11 +103,9 @@ public:
         state* del = head;
         if(temp){
             if(!temp->next){
-                //printf("Aqui %d\n",temp->value);
                 free(del);
             }
             else{
-                //printf("aca\n");
                 temp=temp->next;
                 for(;temp;temp=temp->next){
                     free(del);
@@ -176,17 +184,24 @@ public:
         newOne->x1 = x1;
         newOne->x2 = x2;
         newOne->currAction = currAction;
-        printf("curr action %i\n",currAction);
-        printf("curr action del nodo %i\n",newOne->currAction);
         newOne->next = NULL;
+        newOne->terminal = terminal;
+        printf("curr action %i  x1 %f, x2  %f  V(b)= %f\n",currAction,x1,x2,Vb(w0,w1,w2,x1,x2));
+        printf("curr action del nodo %i\n",newOne->currAction);
         strucLenght++;
     }
 
     float Vb(float w0, float w1, float w2, float x1, float x2){
         if(x1 >= 100)
             return 1000;
-        if(checkFall())
-            return -1000;
+        if(x1 <= -1000 && x2 <= -1000){
+            x1+=1000;
+            x2+=1000;
+            x1*=-1;
+            x2*=-1;
+            //printf("x1 = %f  x2 = %f\n",x1,x2);
+            return 1;
+        }
         return (w0 + (w1*x1) + (w2*x2));
     }
 
@@ -198,79 +213,139 @@ public:
         float slope;
         float x = m_biped->Head->GetPosition().x - m_biped->Pelvis->GetPosition().x;
         float y = m_biped->Head->GetPosition().y - m_biped->Pelvis->GetPosition().y;
-        if(y == 0)
-            return 90;
-        slope = x/y;
+        if(x == 0)
+            return 99999999 ;
+        slope = y/x;
+        //slope = sqrt((slope*slope));
+        //printf("y1 = %f   y2= %f\n",m_biped->Head->GetPosition().y , m_biped->Pelvis->GetPosition().y);
+        //printf("slope %f   y = %f   x= %f\n",slope,y,x);
         return slope;
     }
 
     void getToLastState(){
-        if(timerA!= 0 && .5 >= ((unsigned long) clock() - timerA) / CLOCKS_PER_SEC){
-            return;
-        }
         if(stage == 0){
-            printf("gettolaststate %i\n",ite);
-            temporal = head->next;
-            for(int j = 0; j < ite; j++){
-                if(temporal->next!=NULL)
-                    temporal = temporal->next;
+            printf("ite %i\n",ite);
+            if(ite == 0){
+                m_biped->~Biped();
+                m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
+                temporal = head->next;
+                for(int k = 0; k < 4; k++){
+                    action[k]=actions[0][k];
+                }
+                t.start();
+                ite++;
+                return;
             }
-            printf("current %i",temporal->currAction);
-            for(int k = 0; k < 4; k++){
-                action[k]=actions[temporal->currAction][k];
-            }
-
             if(temporal->next == NULL){
                 ite = 0;
                 stage = 1;
+                t.start();
+                return;
             }
-            timerA = clock();
+            for(int j = 0; j < ite; j++){
+                if(temporal->next!=NULL){
+                    temporal = temporal->next;
+                }
+            }
+            int current = temporal->currAction;
+            for(int k = 0; k < 4; k++){
+                action[k]=actions[current][k];
+            }
             ite++;
+            t.start();
         }
     }
 
-    void getBestState(){
-        if(timerB!= 0 && .5 >= ((unsigned long) clock() - timerB) / CLOCKS_PER_SEC){
-            return;
-        }
-        if(stage == 1){
-            m_biped->~Biped();
-            m_biped = new Biped(m_world, b2Vec2(0.0f, 4.0f));
-            printf("getbeststate");
-            if(ite2 > 0){
-                float x1Temp = xOne();
-                float x2Temp = xTwo();
-                if(checkFall() == 1){
-                    x1 = x1Temp;
-                    x2 = x2Temp;
-                    currAction = ite2;
+    void calculateBest(){
+        if(ite2 > 0 && stage == 2){
+            float x1Temp = xOne();
+            float x2Temp = xTwo();
+            /*if(checkFall() == 1){
+                addState();
+                x1 *= -1;
+                x2 *= -1;
+                x1 -= 1000;
+                x2 -= 1000;
+                currAction = ite2-1;
+                stage = 3;
+                ite2 = 0;
+                updateWeights2();
+                currAction = 0;
+                x1,x2 = 0;
+                return;
+            }
+            else{*/
+                if(x1Temp>100)
+                {
+                    currAction = ite2-1;
                     addState();
-                    //updateWeights();
-                    //return;
+                    stage = 0;
+                    ite2 = 0;
+                    updateWeights2();
+                    stage = 3;
+                    currAction = 0;
+                    x1 = 0;
+                    x2 = 0;
+                    return;
                 }
                 else{
+                    printf("Vb pas = %f  VbNueva = %f\n",Vb(w0,w1,w2,x1,x2),Vb(w0,w1,w2,x1Temp,x2Temp));
                     if(Vb(w0,w1,w2,x1,x2) < Vb(w0,w1,w2,x1Temp,x2Temp)){
+                        //printf("si\n");
                         x1 = x1Temp;
                         x2 = x2Temp;
                         currAction = ite2-1;
                     }
                 }
-            }
-            for(int k = 0; k < 4; k++){
-                action[k]=actions[ite2][k];
-            }
+                if(ite2 == 16)
+                    ite2 = 0;
+                stage = 0;
+            //}
+        }
+    }
 
-            if(ite2==15){
-                addState();
-                for(int k = 0; k < 4; k++){
-                action[k]=0;
+    void doLastState(){
+        if(stage == 1){
+            printf("dolast %i\n",ite2);
+            for(int k = 0; k < 4; k++){
+                action[k] = actions[ite2][k];
             }
+            if(ite2==15){
+                for(int k = 0; k < 4; k++){
+                    action[k] = 0;
+                }
                 stage = 2;
-                ite2=0;
+                ite2++;
+                printf("stage 0! ite:%i  TERMINO\n",ite);
+                addState();
+                currAction = 0;
+                x1 = 0;
+                x2 = 0;
+                t.start();
+                return;
             }
             else{
-                timerB = clock();
+                stage = 2;
+                ite = 0;
                 ite2++;
+                t.start();
+            }
+        }
+    }
+    void loopEd(){
+        if(t.elapsedTime() >= wait){
+            switch(stage){
+                case 0:
+                    getToLastState();
+                    break;
+                case 1:
+                    doLastState();
+                    break;
+                case 2:
+                    calculateBest();
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -399,8 +474,9 @@ public:
     float updateWeight(float Vtrain, float Vb, int xi, float wi){
         float newWi = 0;
 
-        newWi = (wi + (0.1 * (Vtrain - Vb) * xi));
+        newWi = (wi + (0.01 * (Vtrain - Vb) * xi));
 
+        printf("=====updateWeight NEW w%f =====\n",newWi);
         return newWi;
     }
 
@@ -465,12 +541,61 @@ public:
     }
 
 	float loop(){
-	    //setAction();
-	    getToLastState();
-	    getBestState();
 	    doAction();
+	    loopEd();
 	    return m_biped->Head->GetPosition().x;
 	}
+
+    void reset(){
+        state* temp = head;
+        state* del = head;
+        if(temp){
+            if(!temp->next){
+                free(del);
+            }
+            else{
+                temp=temp->next;
+                for(;temp;temp=temp->next){
+                    free(del);
+                    del=temp;
+                }
+                free(del);
+            }
+        }
+        currAction = 0;
+        head = new state;
+		head->x1 = 0;
+		head->x2 = 0;
+		head->currAction = 0;
+		head->next = NULL;
+		x1 = 0;
+		x2 = 0;
+		addState();
+	}
+
+	void updateWeights2(){
+	    state *tempLast = head->next;
+        while(tempLast->next != NULL)
+            tempLast = tempLast->next;
+        while(head->next != tempLast){
+            state *tempUpdate = head->next;
+            while(tempUpdate->next != tempLast && tempUpdate != tempLast)
+                tempUpdate=tempUpdate->next;
+            float VbNext = Vb(w0,w1,w2,tempLast->x1,tempLast->x2);
+            float VbThis = Vb(w0,w1,w2,tempUpdate->x1,tempUpdate->x2);
+            printf("\n\n\nupdateWheights2   w1 = %f   w2= %f\n",w1,w2);
+            w1 = updateWeight(VbNext,VbThis,x1,w1);
+            w2 = updateWeight(VbNext,VbThis,x2,w2);
+            printf("nuevos   w1 = %f   w2= %f   wbNext %f  wbThis %f \n",w1,w2,VbNext,VbThis,x1,x2);
+            tempLast = tempUpdate;
+
+        }
+        printf("\n\n\n\nnuevos   w1 = %f   w2= %f\n\n\n\n",w1,w2);
+        reset();
+        stage = 0;
+        t.start();
+    }
+
 
     // Returns an integer array with the integer in binary
 	int* intToBinary(int integer){

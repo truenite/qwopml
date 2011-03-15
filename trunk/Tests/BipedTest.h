@@ -21,8 +21,6 @@
 
 #include "Biped.h"
 #include<iostream>
-#include "timer.h"
-#include <time.h>
 
 using namespace std;
 
