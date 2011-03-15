@@ -18,7 +18,7 @@
 
 #ifndef TEST_H
 #define TEST_H
-
+#include "timer.h"
 #include "Box2D.h"
 #include "Render.h"
 
